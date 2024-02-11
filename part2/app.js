@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 
 
 const app = express();
-app.set("view-engine", "ejs");
 app.use(express.json());
 
 let cars = [{ number: 1, license: "BM12", model: "BMW" }];
