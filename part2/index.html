@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cars</title>
+  </head>
+  <body>
+    Model <input type="text" id="model" /><br />
+    license <input type="text" id="license" /><br />
+
+    <button onclick="addCar();">add</button>
+    <div id="data"></div>
+
+    <script>
+      async function addCar() {
+        const model = document.getElementById("model").value;
+        console.log(model);
+        const license = document.getElementById("license").value;
+        const body = {
+          model,
+          license,
+        };
+        console.log(body);
+        await fetch("http://localhost:8081/addCar", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+        getAllCars();
+      }
+
+      async function getAllCars() {
+        const response = await fetch("http://localhost:8081/getAllCars");
+        const data = await response.json();
+        const cars = data.data;
+
+        let html = `
+          <table>
+            <tr>
+              <th>Number</th>
+              <th>Model</th>
+              <th>License</th>
+            </tr>`;
+
+        cars.forEach((car) => {
+          html += `
+            <tr>
+              <td>${car.number}</td>
+              <td>${car.model}</td>
+              <td>${car.license}</td>
+              <td><button onclick="deleteCar('${car.number}')">Delete</button></td>
+              <td><form action="/getOneCar" method="get">
+                      <input type="hidden" name="number" value="${car.number}" />
+                      <input type="submit" value="Show Car" />
+                    </form>
+            </td>
+            </tr>`;
+        });
+
+        html += "</table>";
+
+        document.getElementById("data").innerHTML = html;
+      }
+
+      async function deleteCar(number) {
+        let res = await fetch("http://localhost:8081/deleteCar/" + number);
+        let resBody = await res.json();
+
+        alert(resBody.message);
+        getAllCars();
+      }
+
+      getAllCars();
+    </script>
+  </body>
+</html>
